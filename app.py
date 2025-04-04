@@ -22,9 +22,27 @@ def load_model():
     with open("model/car_pred", "rb") as file:
         return pickle.load(file)
 
-def model_pred(fuel_type, transmission_type, engine, seats):
+def model_pred(
+        fuel_type,
+        transmission_type,
+        engine,
+        seats,
+        year=2018,
+        range=4000):
     reg_model = load_model()
-    input_features = [[2018.0, 1, 4000, fuel_type, transmission_type, 19.70, engine, 86.30, seats]]
+    input_features = [
+        [
+            float(year),
+            1,
+            range, 
+            fuel_type,
+            transmission_type,
+            19.70,
+            engine,
+            86.30,
+            seats
+        ]
+    ]
     return reg_model.predict(input_features)
 
 # Use a form to group widgets and control execution
@@ -33,12 +51,18 @@ with st.form("prediction_form"):
 
     fuel_type = col1.selectbox("Select the fuel type",
                                ["Diesel", "Petrol", "CNG", "LPG", "Electric"])
+    
+    year = col1.number_input("Enter the year of manufacture",
+                             min_value=1900, max_value=2023, value=2018, step=1)
 
     engine = col1.slider("Set the Engine Power",
                          500, 5000, step=100)
 
     transmission_type = col2.selectbox("Select the transmission type",
                                        ["Manual", "Automatic"])
+    
+    range = col2.slider("Select KMs Driven",
+                        0, 200000, step=1000)
 
     seats = col2.selectbox("Enter the number of seats",
                            [4, 5, 7, 9, 11])
@@ -59,4 +83,4 @@ if submit_button:
 
 # Display the predicted price if available
 if st.session_state.predicted_price is not None:
-    st.text(f"Predicted Price of the car is: {st.session_state.predicted_price}")
+    st.text(f"Predicted Price of the car is: {st.session_state.predicted_price:.2f} Lakhs")
