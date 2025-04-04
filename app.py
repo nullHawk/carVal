@@ -27,24 +27,36 @@ def model_pred(fuel_type, transmission_type, engine, seats):
     input_features = [[2018.0, 1, 4000, fuel_type, transmission_type, 19.70, engine, 86.30, seats]]
     return reg_model.predict(input_features)
 
-## Formatting and adding dropdowns and sliders
-col1, col2 = st.columns(2)
+# Use a form to group widgets and control execution
+with st.form("prediction_form"):
+    col1, col2 = st.columns(2)
 
-fuel_type = col1.selectbox("Select the fuel type",
-                           ["Diesel", "Petrol", "CNG", "LPG", "Electric"])
+    fuel_type = col1.selectbox("Select the fuel type",
+                               ["Diesel", "Petrol", "CNG", "LPG", "Electric"])
 
-engine = col1.slider("Set the Engine Power",
-                     500, 5000, step=100)
+    engine = col1.slider("Set the Engine Power",
+                         500, 5000, step=100)
 
-transmission_type = col2.selectbox("Select the transmission type",
-                                   ["Manual", "Automatic"])
+    transmission_type = col2.selectbox("Select the transmission type",
+                                       ["Manual", "Automatic"])
 
-seats = col2.selectbox("Enter the number of seats",
-                       [4,5,7,9,11])
+    seats = col2.selectbox("Enter the number of seats",
+                           [4, 5, 7, 9, 11])
 
-if (st.button("Predict Price")):
-    fuel_type = encode_dict['fuel_type'][fuel_type]
-    transmission_type = encode_dict['transmission_type'][transmission_type]
+    # Submit button for the form
+    submit_button = st.form_submit_button("Predict Price")
 
-    price = model_pred(fuel_type, transmission_type, engine, seats)
-    st.text("Predicted Price of the car is: " + str(price))
+# Use session state to control when the prediction is triggered
+if "predicted_price" not in st.session_state:
+    st.session_state.predicted_price = None
+
+if submit_button:
+    fuel_type_encoded = encode_dict['fuel_type'][fuel_type]
+    transmission_type_encoded = encode_dict['transmission_type'][transmission_type]
+
+    # Perform prediction and store it in session state
+    st.session_state.predicted_price = model_pred(fuel_type_encoded, transmission_type_encoded, engine, seats)[0]
+
+# Display the predicted price if available
+if st.session_state.predicted_price is not None:
+    st.text(f"Predicted Price of the car is: {st.session_state.predicted_price}")
