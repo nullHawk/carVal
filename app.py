@@ -79,7 +79,7 @@ if submit_button:
     transmission_type_encoded = encode_dict['transmission_type'][transmission_type]
 
     # Perform prediction and store it in session state
-    st.session_state.predicted_price = model_pred(fuel_type_encoded, transmission_type_encoded, engine, seats)[0]
+    st.session_state.predicted_price = model_pred(fuel_type_encoded, transmission_type_encoded, engine, seats, year, range)[0]
 
 # Display the predicted price if available
 if st.session_state.predicted_price is not None:
